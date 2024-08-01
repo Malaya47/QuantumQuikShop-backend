@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
-const cors = require("cors")
+const cors = require("cors");
 
 const corsOptions = {
   origin: "*",
-  credentials: true
-}
+  credentials: true,
+};
 
 const { intializeDatabase } = require("./db/db.connect");
 const Product = require("./models/product.models");
@@ -14,7 +14,6 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 intializeDatabase();
-
 
 app.get("/", (req, res) => {
   res.send("This is express server");
@@ -26,12 +25,10 @@ app.post("/products", async (req, res) => {
     const createProduct = new Product(req.body);
     const saveProduct = await createProduct.save();
     if (saveProduct) {
-      res
-        .status(201)
-        .json({
-          message: "Data added successfuly",
-          createProduct: createProduct,
-        });
+      res.status(201).json({
+        message: "Data added successfuly",
+        createProduct: createProduct,
+      });
     } else {
       res.status(401).json({ error: "An error occured while adding data" });
     }
@@ -76,6 +73,6 @@ app.get("/products/category/:category", async (req, res) => {
 });
 
 const PORT = 3000;
-app.listen(() => {
+app.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
 });
