@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-require("dotenv").config({ path: "./KEYS.env" });
+require("dotenv").config({ path: "./.env" });
 
 // Access your MongoDB connection string from secrets
 const mongoURI = process.env.MONGO_Connection_String;
