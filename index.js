@@ -154,16 +154,26 @@ app.put("/product/updateQuantity/:id", async (req, res) => {
     const { quantity } = req.body;
 
     // Find the product in the cart by ID
-    const product = cart.cart.find((item) => item._id.toString() === id);
+    const productIndex = cart.cart.findIndex(
+      (item) => item._id.toString() === id
+    );
 
-    if (product) {
-      // Update the product quantity
-      product.quantity = quantity;
+    if (productIndex !== -1) {
+      if (quantity < 1) {
+        // Remove the product from the cart if quantity is less than 1
+        cart.cart.splice(productIndex, 1);
+      } else {
+        // Update the product quantity if it's valid
+        cart.cart[productIndex].quantity = quantity;
+      }
 
       // Save the updated cart
       const updatedCart = await cart.save();
       res.status(200).json({
-        message: "Quantity updated successfully",
+        message:
+          quantity < 1
+            ? "Product removed successfully"
+            : "Quantity updated successfully",
         cart: updatedCart,
       });
     } else {
@@ -172,7 +182,7 @@ app.put("/product/updateQuantity/:id", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ error: "Failed to update quantity", details: error.message });
+      .json({ error: "Failed to update cart", details: error.message });
   }
 });
 
