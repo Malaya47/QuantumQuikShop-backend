@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const corsOptions = {
   origin: "*",
@@ -12,6 +14,7 @@ const Product = require("./models/product.models");
 const Cart = require("./models/cart.models");
 const Wishlist = require("./models/wishlist.models");
 const Address = require("./models/address.models");
+const ecommerceUser = require("./models/user.models");
 
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -387,6 +390,81 @@ app.delete("/addresses/deleteAddress/:id", async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while deleting the address" });
   }
+});
+
+
+// AUTHENTICATION
+
+// User registration
+app.post("/register", async (req, res) => {
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const userDetails = { ...req.body, password: hashedPassword };
+
+    const createUser = new ecommerceUser(userDetails);
+    const savedUser = await createUser.save();
+
+    res
+      .status(201)
+      .json({ message: "User registered successfully", user: savedUser });
+  } catch (error) {
+    console.error("Error during registration:", error); // Log the error for debugging
+    res.status(500).json({
+      message: "An error occurred while registering user",
+      error: error.message,
+    });
+  }
+});
+
+// middleware to verify token
+const verifyJWT = (req, res, next) => {
+  const token = req.headers["authorization"];
+
+  if (!token) {
+    res.status(401).json({ message: "No token provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, "Malaya");
+
+    next();
+  } catch (error) {
+    res.status(402).json({ message: "Invalid token" });
+  }
+};
+
+// User login
+app.post("/login", async (req, res) => {
+  const userCredentials = req.body;
+  try {
+    const findUser = await ecommerceUser.findOne({
+      email: userCredentials.email,
+    });
+
+    if (!findUser) {
+      res.status(404).json({ message: "User not found please register" });
+    }
+
+    const matchPassword = await bcrypt.compare(
+      userCredentials.password,
+      findUser.password
+    );
+
+    if (matchPassword) {
+      const token = jwt.sign({ email: userCredentials.email }, "Malaya", {
+        expiresIn: "24h",
+      });
+
+      res.json({ message: "Login Success", token });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "An error occured while login" });
+  }
+});
+
+// sample route to test middleware
+app.get("/data", verifyJWT, (req, res) => {
+  res.json({ message: "Data found" });
 });
 
 const PORT = 3000;
