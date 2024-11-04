@@ -223,7 +223,7 @@ app.delete("/product/deleteProduct/:id", async (req, res) => {
 });
 
 // route for add to wishlist array
-app.post("/products/addToWishlist", async (req, res) => {
+app.post("/products/addToWishlist", verifyJWT, async (req, res) => {
   try {
     // Find the existing wishlist (there should only be one wishlist)
     let wishlist = await Wishlist.findOne();
