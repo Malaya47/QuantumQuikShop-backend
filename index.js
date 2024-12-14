@@ -324,7 +324,7 @@ app.post("/addresses/addAddress", async (req, res) => {
 
 app.get("addresses/getAddress", async (req, res) => {
   try {
-    const address = await Address.find();
+    const address = await Address.findOne();
     if (address) {
       res
         .status(200)
