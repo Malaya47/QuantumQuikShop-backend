@@ -326,9 +326,10 @@ app.get("addresses/getAddress", async (req, res) => {
   try {
     const address = await Address.findOne();
     if (address) {
-      res
-        .status(200)
-        .json({ message: "Addresses found successfully", address });
+      res.status(200).json({
+        message: "Addresses found successfully",
+        address: address.address,
+      });
     } else {
       res.status(404).json({ message: "No address found" });
     }
