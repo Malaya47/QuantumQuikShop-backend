@@ -322,6 +322,23 @@ app.post("/addresses/addAddress", async (req, res) => {
   }
 });
 
+app.get("addresses/getAddress", async (req, res) => {
+  try {
+    const address = await Address.find();
+    if (address) {
+      res
+        .status(200)
+        .json({ message: "Addresses found successfully", address });
+    } else {
+      res.status(404).json({ message: "No address found" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "An error occured while getting addresses", error });
+  }
+});
+
 // route for address put request
 app.put("/addresses/updateAddress/:id", async (req, res) => {
   try {
