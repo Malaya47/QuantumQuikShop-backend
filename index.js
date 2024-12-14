@@ -454,7 +454,12 @@ app.post("/login", async (req, res) => {
         expiresIn: "24h",
       });
 
-      res.json({ message: "Login Success", token });
+      res.json({
+        message: "Login Success",
+        token,
+        name: findUser.name,
+        email: findUser.email,
+      });
     }
   } catch (error) {
     res.status(500).json({ message: "An error occured while login" });
