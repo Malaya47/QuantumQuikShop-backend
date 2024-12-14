@@ -322,7 +322,8 @@ app.post("/addresses/addAddress", async (req, res) => {
   }
 });
 
-app.get("addresses/getAddress", async (req, res) => {
+// route to get addresses
+app.get("/addresses/getAddress", async (req, res) => {
   try {
     const address = await Address.findOne();
     if (address) {
